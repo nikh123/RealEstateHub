@@ -114,15 +114,12 @@ public class OfferResource {
                 System.out.println("Could not fetch buyer email, using default");
             }
             
-            String sellerEmail = "seller@realestatehub.com"; // Seller notification
-            
             boolean emailSent = EmailNotificationService.sendOfferStatusNotification(
                 offerId.toString(),
                 offer.getPropertyId().toString(),
                 oldStatus.toString(),
                 newStatus.toString(),
-                buyerEmail,
-                sellerEmail
+                buyerEmail
             );
             
             // Add email status to response

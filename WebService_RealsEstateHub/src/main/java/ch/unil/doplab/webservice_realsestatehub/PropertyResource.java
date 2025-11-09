@@ -32,6 +32,16 @@ public class PropertyResource {
                     Property.PropertyType.valueOf(dto.getType())
             );
             
+            // Set status if provided
+            if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
+                property.setStatus(Property.PropertyStatus.valueOf(dto.getStatus()));
+            }
+            
+            // Set features if provided
+            if (dto.getFeatures() != null && !dto.getFeatures().isEmpty()) {
+                dto.getFeatures().forEach(property::addFeature);
+            }
+            
             properties.put(property.getPropertyId(), property);
             
             return Response.status(Response.Status.CREATED)
@@ -164,6 +174,8 @@ public class PropertyResource {
         private double price;
         private double size;
         private String type; // APARTMENT, HOUSE, etc.
+        private String status; // FOR_SALE, PENDING, SOLD, OFF_MARKET
+        private Map<String, Object> features; // bedrooms, bathrooms, etc.
 
         // Getters and setters
         public String getTitle() { return title; }
@@ -186,6 +198,12 @@ public class PropertyResource {
         
         public String getType() { return type; }
         public void setType(String type) { this.type = type; }
+        
+        public String getStatus() { return status; }
+        public void setStatus(String status) { this.status = status; }
+        
+        public Map<String, Object> getFeatures() { return features; }
+        public void setFeatures(Map<String, Object> features) { this.features = features; }
     }
 
     // Helper classes for responses
