@@ -1,6 +1,7 @@
 package ch.unil.doplab.webservice_realsestatehub;
 
 import ch.unil.doplab.Offer;
+import ch.unil.doplab.Buyer;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -97,10 +98,42 @@ public class OfferResource {
                         .build();
             }
             
+            // Store old status for email notification
+            Offer.Status oldStatus = offer.getStatus();
             Offer.Status newStatus = Offer.Status.valueOf(statusDto.getStatus());
             offer.setStatus(newStatus);
             
-            return Response.ok(offer).build();
+            // Get buyer's email from BuyerResource
+            String buyerEmail = "nikhilesh.acharya@unil.ch"; // Default fallback
+            try {
+                Buyer buyer = BuyerResource.getBuyerById(offer.getBuyerId());
+                if (buyer != null && buyer.getEmail() != null) {
+                    buyerEmail = buyer.getEmail();
+                }
+            } catch (Exception e) {
+                System.out.println("Could not fetch buyer email, using default");
+            }
+            
+            String sellerEmail = "seller@realestatehub.com"; // Seller notification
+            
+            boolean emailSent = EmailNotificationService.sendOfferStatusNotification(
+                offerId.toString(),
+                offer.getPropertyId().toString(),
+                oldStatus.toString(),
+                newStatus.toString(),
+                buyerEmail,
+                sellerEmail
+            );
+            
+            // Add email status to response
+            Map<String, Object> response = new HashMap<>();
+            response.put("offer", offer);
+            response.put("emailNotificationSent", emailSent);
+            response.put("message", emailSent ? 
+                "Offer status updated and email notifications sent via external API" : 
+                "Offer status updated but email notification failed");
+            
+            return Response.ok(response).build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ErrorResponse("Invalid status. Use: PENDING, ACCEPTED, REJECTED, WITHDRAWN"))

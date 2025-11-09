@@ -23,6 +23,14 @@ static {
     buyers.put(buyer1.getUserID(), buyer1);
     buyers.put(buyer2.getUserID(), buyer2);
 }
+
+    /**
+     * Static method to get buyer by ID (for internal use)
+     */
+    public static Buyer getBuyerById(UUID buyerId) {
+        return buyers.get(buyerId);
+    }
+
     /**
      * Créer un nouvel acheteur
      * POST /api/buyers
