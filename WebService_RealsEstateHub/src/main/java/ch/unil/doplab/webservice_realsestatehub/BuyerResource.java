@@ -1,7 +1,7 @@
-package ch.unil.doplab.webservice_realsestatehub; // Adaptez le package au besoin
+package ch.unil.doplab.webservice_realsestatehub;
 
-import ch.unil.doplab.Buyer; // Assurez-vous d'importer votre classe Buyer
-import jakarta.annotation.PostConstruct;
+import ch.unil.doplab.Buyer;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -13,23 +13,8 @@ import java.util.*;
 @Consumes(MediaType.APPLICATION_JSON)
 public class BuyerResource {
 
-    // Stockage en mémoire
-    private static final Map<UUID, Buyer> buyers = new HashMap<>();
-
-    public static final Buyer buyer1 = new Buyer("Alice", "Martin", "alice@demo.com", "alice", "pass123", 350000);
-    public static final Buyer buyer2 = new Buyer("Jonathan", "Grossrieder", "jonathan.grossrieder@unil.ch", "Jon", "pass456", 550000);
-
-static {
-    buyers.put(buyer1.getUserID(), buyer1);
-    buyers.put(buyer2.getUserID(), buyer2);
-}
-
-    /**
-     * Static method to get buyer by ID (for internal use)
-     */
-    public static Buyer getBuyerById(UUID buyerId) {
-        return buyers.get(buyerId);
-    }
+    @Inject
+    private ApplicationState state;
 
     /**
      * Créer un nouvel acheteur
@@ -59,7 +44,7 @@ static {
                     dto.getBudget()
             );
 
-            buyers.put(buyer.getUserID(), buyer);
+            state.getBuyers().put(buyer.getUserID(), buyer);
 
             return Response.status(Response.Status.CREATED)
                     .entity(buyer)
@@ -77,7 +62,7 @@ static {
      */
     @GET
     public Response getAllBuyers() {
-        return Response.ok(new ArrayList<>(buyers.values())).build();
+        return Response.ok(new ArrayList<>(state.getBuyers().values())).build();
     }
 
     /**
@@ -89,7 +74,7 @@ static {
     public Response getBuyerById(@PathParam("id") String id) {
         try {
             UUID buyerId = UUID.fromString(id);
-            Buyer buyer = buyers.get(buyerId);
+            Buyer buyer = state.getBuyers().get(buyerId);
 
             if (buyer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -114,7 +99,7 @@ static {
     public Response updateBuyerBudget(@PathParam("id") String id, BudgetDTO dto) {
         try {
             UUID buyerId = UUID.fromString(id);
-            Buyer buyer = buyers.get(buyerId);
+            Buyer buyer = state.getBuyers().get(buyerId);
 
             if (buyer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -147,7 +132,7 @@ static {
     public Response deleteBuyer(@PathParam("id") String id) {
         try {
             UUID buyerId = UUID.fromString(id);
-            Buyer removed = buyers.remove(buyerId);
+            Buyer removed = state.getBuyers().remove(buyerId);
 
             if (removed == null) {
                 return Response.status(Response.Status.NOT_FOUND)

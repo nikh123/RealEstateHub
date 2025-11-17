@@ -2,6 +2,7 @@ package ch.unil.doplab.webservice_realsestatehub;
 
 import ch.unil.doplab.Offer;
 import ch.unil.doplab.Buyer;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -13,8 +14,8 @@ import java.util.*;
 @Consumes(MediaType.APPLICATION_JSON)
 public class OfferResource {
 
-    // In-memory storage
-    private static final Map<UUID, Offer> offers = new HashMap<>();
+    @Inject
+    private ApplicationState state;
 
     /**
      * Create a new offer
@@ -35,7 +36,7 @@ public class OfferResource {
                     dto.getAmount()
             );
             
-            offers.put(offer.getOfferId(), offer);
+            state.getOffers().put(offer.getOfferId(), offer);
             
             return Response.status(Response.Status.CREATED)
                     .entity(offer)
@@ -53,7 +54,7 @@ public class OfferResource {
      */
     @GET
     public Response getAllOffers() {
-        return Response.ok(new ArrayList<>(offers.values())).build();
+        return Response.ok(new ArrayList<>(state.getOffers().values())).build();
     }
 
     /**
@@ -65,7 +66,7 @@ public class OfferResource {
     public Response getOfferById(@PathParam("id") String id) {
         try {
             UUID offerId = UUID.fromString(id);
-            Offer offer = offers.get(offerId);
+            Offer offer = state.getOffers().get(offerId);
             
             if (offer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -90,7 +91,7 @@ public class OfferResource {
     public Response updateOfferStatus(@PathParam("id") String id, StatusDTO statusDto) {
         try {
             UUID offerId = UUID.fromString(id);
-            Offer offer = offers.get(offerId);
+            Offer offer = state.getOffers().get(offerId);
             
             if (offer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -103,10 +104,10 @@ public class OfferResource {
             Offer.Status newStatus = Offer.Status.valueOf(statusDto.getStatus());
             offer.setStatus(newStatus);
             
-            // Get buyer's email from BuyerResource
+            // Get buyer's email from ApplicationState
             String buyerEmail = "nikhilesh.acharya@unil.ch"; // Default fallback
             try {
-                Buyer buyer = BuyerResource.getBuyerById(offer.getBuyerId());
+                Buyer buyer = state.getBuyerById(offer.getBuyerId());
                 if (buyer != null && buyer.getEmail() != null) {
                     buyerEmail = buyer.getEmail();
                 }
@@ -147,7 +148,7 @@ public class OfferResource {
     public Response deleteOffer(@PathParam("id") String id) {
         try {
             UUID offerId = UUID.fromString(id);
-            Offer removed = offers.remove(offerId);
+            Offer removed = state.getOffers().remove(offerId);
             
             if (removed == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -174,7 +175,7 @@ public class OfferResource {
     public Response getOffersByProperty(@PathParam("propertyId") String propertyId) {
         try {
             UUID propId = UUID.fromString(propertyId);
-            List<Offer> propertyOffers = offers.values().stream()
+            List<Offer> propertyOffers = state.getOffers().values().stream()
                     .filter(o -> o.getPropertyId().equals(propId))
                     .toList();
             

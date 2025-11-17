@@ -19,7 +19,7 @@ class BuyerSellerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-
+        // Create a buyer with budget
         buyer = new Buyer("John", "Doe", "john@buyer.com", "johndoe", "pass123", 600000);
 
         // Create a seller

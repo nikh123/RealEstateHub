@@ -1,6 +1,7 @@
 package ch.unil.doplab.webservice_realsestatehub;
 
 import ch.unil.doplab.Property;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -12,8 +13,8 @@ import java.util.*;
 @Consumes(MediaType.APPLICATION_JSON)
 public class PropertyResource {
 
-    // In-memory storage (in real app, use database)
-    private static final Map<UUID, Property> properties = new HashMap<>();
+    @Inject
+    private ApplicationState state;
 
     /**
      * Create a new property
@@ -42,7 +43,7 @@ public class PropertyResource {
                 dto.getFeatures().forEach(property::addFeature);
             }
             
-            properties.put(property.getPropertyId(), property);
+            state.getProperties().put(property.getPropertyId(), property);
             
             return Response.status(Response.Status.CREATED)
                     .entity(property)
@@ -60,7 +61,7 @@ public class PropertyResource {
      */
     @GET
     public Response getAllProperties() {
-        return Response.ok(new ArrayList<>(properties.values())).build();
+        return Response.ok(new ArrayList<>(state.getProperties().values())).build();
     }
 
     /**
@@ -72,7 +73,7 @@ public class PropertyResource {
     public Response getPropertyById(@PathParam("id") String id) {
         try {
             UUID propertyId = UUID.fromString(id);
-            Property property = properties.get(propertyId);
+            Property property = state.getProperties().get(propertyId);
             
             if (property == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -97,7 +98,7 @@ public class PropertyResource {
     public Response updateProperty(@PathParam("id") String id, PropertyDTO dto) {
         try {
             UUID propertyId = UUID.fromString(id);
-            Property property = properties.get(propertyId);
+            Property property = state.getProperties().get(propertyId);
             
             if (property == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -132,7 +133,7 @@ public class PropertyResource {
     public Response deleteProperty(@PathParam("id") String id) {
         try {
             UUID propertyId = UUID.fromString(id);
-            Property removed = properties.remove(propertyId);
+            Property removed = state.getProperties().remove(propertyId);
             
             if (removed == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -157,7 +158,7 @@ public class PropertyResource {
     @GET
     @Path("/search")
     public Response searchProperties(@QueryParam("location") String location) {
-        List<Property> results = properties.values().stream()
+        List<Property> results = state.getProperties().values().stream()
                 .filter(p -> location == null || 
                         (p.getLocation() != null && p.getLocation().equalsIgnoreCase(location)))
                 .toList();
