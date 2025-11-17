@@ -73,7 +73,7 @@ public class PropertyResource {
     public Response getPropertyById(@PathParam("id") String id) {
         try {
             UUID propertyId = UUID.fromString(id);
-            Property property = state.getProperties().get(propertyId);
+            Property property = state.getPropertyById(propertyId);
             
             if (property == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -98,7 +98,7 @@ public class PropertyResource {
     public Response updateProperty(@PathParam("id") String id, PropertyDTO dto) {
         try {
             UUID propertyId = UUID.fromString(id);
-            Property property = state.getProperties().get(propertyId);
+            Property property = state.getPropertyById(propertyId);
             
             if (property == null) {
                 return Response.status(Response.Status.NOT_FOUND)

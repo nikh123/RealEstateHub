@@ -66,7 +66,7 @@ public class OfferResource {
     public Response getOfferById(@PathParam("id") String id) {
         try {
             UUID offerId = UUID.fromString(id);
-            Offer offer = state.getOffers().get(offerId);
+            Offer offer = state.getOfferById(offerId);
             
             if (offer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -91,7 +91,7 @@ public class OfferResource {
     public Response updateOfferStatus(@PathParam("id") String id, StatusDTO statusDto) {
         try {
             UUID offerId = UUID.fromString(id);
-            Offer offer = state.getOffers().get(offerId);
+            Offer offer = state.getOfferById(offerId);
             
             if (offer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -120,7 +120,8 @@ public class OfferResource {
                 offer.getPropertyId().toString(),
                 oldStatus.toString(),
                 newStatus.toString(),
-                buyerEmail
+                buyerEmail,
+                "seller@realestatehub.com" // Default seller email
             );
             
             // Add email status to response

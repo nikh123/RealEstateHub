@@ -14,3 +14,4 @@ services:
       #auto deploy (maps local target artefact to container)
       - ./WebService_RealsEstateHub/target/WebService_RealsEstateHub-1.0-SNAPSHOT.war:/opt/payara/appserver/glassfish/domains/domain1/autodeploy/WebService_RealsEstateHub-1.0-SNAPSHOT.war
       - ./WebApplication/target/WebApplication-1.0-SNAPSHOT.war:/opt/payara/appserver/glassfish/domains/domain1/autodeploy/WebApplication-1.0-SNAPSHOT.war
+

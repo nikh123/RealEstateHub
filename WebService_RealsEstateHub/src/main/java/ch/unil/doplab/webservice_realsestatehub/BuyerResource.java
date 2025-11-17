@@ -74,7 +74,7 @@ public class BuyerResource {
     public Response getBuyerById(@PathParam("id") String id) {
         try {
             UUID buyerId = UUID.fromString(id);
-            Buyer buyer = state.getBuyers().get(buyerId);
+            Buyer buyer = state.getBuyerById(buyerId);
 
             if (buyer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -99,7 +99,7 @@ public class BuyerResource {
     public Response updateBuyerBudget(@PathParam("id") String id, BudgetDTO dto) {
         try {
             UUID buyerId = UUID.fromString(id);
-            Buyer buyer = state.getBuyers().get(buyerId);
+            Buyer buyer = state.getBuyerById(buyerId);
 
             if (buyer == null) {
                 return Response.status(Response.Status.NOT_FOUND)
