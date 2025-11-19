@@ -170,3 +170,30 @@ p {
 form {
     display: inline;
 }
+
+.status-ACCEPTED {
+    background-color: #4CAF50; /* Vert */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-REJECTED {
+    background-color: #f44336; /* Rouge */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-WITHDRAWN {
+    background-color: #9E9E9E; /* Gris */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
